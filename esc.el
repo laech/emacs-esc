@@ -1,16 +1,17 @@
 
+(defvar esc--test-command-override nil)
+
 (defun esc--lookup-key (key)
   (cond
-   ((local-key-binding key))
-   ((minor-mode-key-binding key))
-   ((global-key-binding key))))
+   (esc--test-command-override)
+   ((key-binding key))))
 
 (defun esc--keyboard-quit ()
   (interactive)
   (apply
    (cond
     ((esc--lookup-key (kbd "C-g")))
-    (t (list keyboard-quit)))
+    (t '(keyboard-quit)))
    nil))
 
 (defvar esc--gui-mode-map
