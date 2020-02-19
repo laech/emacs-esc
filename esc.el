@@ -34,63 +34,45 @@
   "Toggle one esc mode in GUI Emacs."
   :global t)
 
-
-(defvar esc--terminal-last-keymap nil)
-(defvar esc--terminal-last-keymap-esc-command nil)
-
-(defun esc--terminal-set-last-keymap (keymap)
-  (when esc--terminal-last-keymap
-    (define-key esc--terminal-last-keymap
-      [?\e] esc--terminal-last-keymap-esc-command))
-
-  (setq esc--terminal-last-keymap nil)
-  (setq esc--terminal-last-keymap-esc-command nil)
-
-  (when keymap
-    (setq esc--terminal-last-keymap keymap)
-    (setq esc--terminal-last-keymap-esc-command (lookup-key keymap [?\e]))
-    (define-key keymap [?\e] 'esc--terminal-keyboard-quit)))
-
-(defun esc--terminal-keyboard-quit ()
-  (interactive)
+(defun esc--read-events (events)
   (let ((event (read-event nil nil 0.01)))
-    (if (not event)
+    (if event
+        (esc--read-events (cons event events))
+      (reverse events))))
+
+(defun esc--terminal-decode (prompt)
+  (let ((events (esc--read-events nil)))
+    (if (not events)
         (esc--keyboard-quit)
+      (let ((def (if esc--meta-decode-map
+                     (lookup-key esc--meta-decode-map (vconcat events))
+                   nil)))
+        (cond
+         ((functionp def)
+          (apply def (list prompt)))
+         (def)
+         ((= 1 (length events))
+          (vector (event-apply-modifier (car events) 'meta 27 "M-")))
+         (t
+          (push 27 events)
+          (vconcat events)))))))
 
-      (let* ((new-event (event-apply-modifier event 'meta 27 "M-"))
-             (def (esc--lookup-key-in-active-maps (vector new-event))))
-        (push new-event unread-command-events)
-        (when (keymapp def)
-          (esc--terminal-set-last-keymap def))
-        (when overriding-terminal-local-map
-          (define-key overriding-terminal-local-map (kbd "ESC") nil))))))
-
-(defun esc--terminal-init-key ()
-  (esc--terminal-set-last-keymap nil)
-  (if (eq this-command 'describe-key)
-      (when overriding-terminal-local-map
-        (define-key overriding-terminal-local-map (kbd "ESC") nil))
-    (unless overriding-terminal-local-map
-      (setq overriding-terminal-local-map (make-sparse-keymap)))
-    (define-key overriding-terminal-local-map
-      (kbd "ESC") 'esc--terminal-keyboard-quit)))
+(defvar esc--meta-decode-map nil)
 
 (define-minor-mode esc--terminal-mode
   "Toggle one esc mode in terminal Emacs."
   :global t
   (cond
    (esc--terminal-mode
-    (add-hook 'pre-command-hook 'esc--terminal-init-key)
-    (esc--terminal-init-key))
+    (setq esc--meta-decode-map (lookup-key input-decode-map [?\e]))
+    (define-key input-decode-map [?\e] 'esc--terminal-decode))
    (t
-    (remove-hook 'pre-command-hook 'esc--terminal-init-key)
-    (esc--terminal-set-last-keymap nil)
-    (when overriding-terminal-local-map
-      (define-key overriding-terminal-local-map [?\e] nil)))))
+    (define-key input-decode-map [?\e] esc--meta-decode-map)
+    (setq esc--meta-decode-map nil))))
 
 
 (define-minor-mode esc-mode
-  "Toggle one esc mode."
+  "Toggle esc mode."
   :global t
   (cond
    (esc-mode
