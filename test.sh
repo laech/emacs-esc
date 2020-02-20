@@ -14,22 +14,22 @@ readonly init_package_el="(progn \
     (unless (package-installed-p pkg) \
       (package-install pkg))))"
 
-# emacs \
-#     -Q \
-#     -batch \
-#     --eval "$init_package_el" \
-#     -l package-lint.el \
-#     --eval "(setq byte-compile-error-on-warn t)" \
-#     -f batch-byte-compile \
-#     esc.el
+emacs \
+    -Q \
+    -batch \
+    --eval "$init_package_el" \
+    -l package-lint.el \
+    --eval "(setq byte-compile-error-on-warn t)" \
+    -f batch-byte-compile \
+    esc.el
 
-# emacs \
-#     -Q \
-#     -batch \
-#     --eval "$init_package_el" \
-#     -l package-lint.el \
-#     -f package-lint-batch-and-exit \
-#     esc.el
+emacs \
+    -Q \
+    -batch \
+    --eval "$init_package_el" \
+    -l package-lint.el \
+    -f package-lint-batch-and-exit \
+    esc.el
 
 emacs \
     -Q \
