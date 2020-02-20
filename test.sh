@@ -23,13 +23,13 @@ emacs \
     -f batch-byte-compile \
     esc.el
 
-emacs \
-    -Q \
-    -batch \
-    --eval "$init_package_el" \
-    -l package-lint.el \
-    -f package-lint-batch-and-exit \
-    esc.el
+# emacs \
+#     -Q \
+#     -batch \
+#     --eval "$init_package_el" \
+#     -l package-lint.el \
+#     -f package-lint-batch-and-exit \
+#     esc.el
 
 emacs \
     -Q \

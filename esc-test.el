@@ -17,21 +17,21 @@
    (define-key input-decode-map [?\e ?1] [up])
    (esc-mode)
    (setq unread-command-events (list ?1))
-   (should (equal [up] (esc--terminal-decode nil)))))
+   (should (equal [up] (esc--decode nil)))))
 
 (ert-deftest should-be-able-to-decode-multiple-events ()
   (test
    (define-key input-decode-map [?\e ?1 ?2] [down])
    (esc-mode)
    (setq unread-command-events (list ?1 ?2))
-   (should (equal [down] (esc--terminal-decode nil)))))
+   (should (equal [down] (esc--decode nil)))))
 
 (ert-deftest should-be-able-to-decode-using-function ()
   (test
    (define-key input-decode-map [?\e ?3] (lambda (prompt) [left]))
    (esc-mode)
    (setq unread-command-events (list ?3))
-   (should (equal [left] (esc--terminal-decode nil)))))
+   (should (equal [left] (esc--decode nil)))))
 
 (ert-deftest should-pass-through-single-event-when-not-in-map ()
   (test
@@ -42,7 +42,7 @@
    (should
     (equal
      (vector (event-apply-modifier ?i 'meta ?\e "M-"))
-     (esc--terminal-decode nil)))))
+     (esc--decode nil)))))
 
 (ert-deftest should-pass-through-multiple-events-when-not-in-map ()
   (test
@@ -53,13 +53,13 @@
    (should
     (equal
      (vector ?\e ?i ?j)
-     (esc--terminal-decode nil)))))
+     (esc--decode nil)))))
 
 (ert-deftest should-execute-quit-command-esc-has-associated-event ()
   (test
    (setq esc--test-command-override (lambda () [right]))
    (esc-mode)
-   (should (equal [right] (esc--terminal-decode nil)))))
+   (should (equal [right] (esc--decode nil)))))
 
 (ert-deftest should-restore-original-keymap ()
   (test
@@ -72,7 +72,7 @@
      (esc-mode)
      (should
       (equal
-       'esc--terminal-decode
+       'esc--decode
        (lookup-key input-decode-map [?\e])))
 
      (esc-mode -1)
