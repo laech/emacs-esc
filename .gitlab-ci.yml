@@ -4,7 +4,7 @@ test:
   stage: test
   script: apk --update add emacs-nox make && make
 
-repo:
+pages:
   stage: deploy
   script:
     - mkdir -p public/packages/esc
