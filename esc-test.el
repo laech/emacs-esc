@@ -21,10 +21,10 @@
 
 (ert-deftest should-be-able-to-decode-multiple-events ()
   (test
-   (define-key input-decode-map [?\e ?1 ?2] [down])
+   (define-key input-decode-map "\e[1;5C" [C-right])
    (esc-mode)
-   (setq unread-command-events (list ?1 ?2))
-   (should (equal [down] (esc--decode nil)))))
+   (setq unread-command-events (listify-key-sequence "[1;5C"))
+   (should (equal [C-right] (esc--decode nil)))))
 
 (ert-deftest should-be-able-to-decode-using-function ()
   (test
@@ -39,20 +39,20 @@
    (should-not (lookup-key input-decode-map [?\e ?i]))
    (esc-mode)
    (setq unread-command-events (list ?i))
-   (should
-    (equal
-     (vector (event-apply-modifier ?i 'meta ?\e "M-"))
-     (esc--decode nil)))))
+   (should (equal [?\e ?i] (esc--decode nil)))))
 
 (ert-deftest should-pass-through-multiple-events-when-not-in-map ()
   (test
-   (define-key input-decode-map [?\e ?i ?j] nil)
-   (should-not (lookup-key input-decode-map [?\e ?i ?j]))
+   (define-key input-decode-map "\e[1;5C" nil)
+   (should
+    (let ((def (lookup-key input-decode-map "\e[1;5C")))
+      (or (not def)
+          (numberp def))))
    (esc-mode)
-   (setq unread-command-events (list ?i ?j))
+   (setq unread-command-events (listify-key-sequence "[1;5C"))
    (should
     (equal
-     (vector ?\e ?i ?j)
+     (vconcat (listify-key-sequence "\e[1;5C"))
      (esc--decode nil)))))
 
 (ert-deftest should-execute-quit-command-esc-has-associated-event ()

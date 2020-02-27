@@ -6,5 +6,9 @@ compile:
 test:
 	./test.sh
 
-debug:
+debug-gui:
 	emacs -Q -l esc.el --eval "(esc-mode)"
+
+debug-term:
+	emacs -Q -l esc.el --eval "(progn (xterm-mouse-mode) (esc-mode))" -nw
+

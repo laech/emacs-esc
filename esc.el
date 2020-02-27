@@ -44,22 +44,22 @@
         (esc--read-events (cons event events))
       (reverse events))))
 
+(defun esc--process (prompt keymap previous-events)
+  (let* ((event (read-event nil nil 0.01))
+         (events (cons event previous-events)))
+    (if (and event keymap)
+        (let ((def (lookup-key keymap (vector event))))
+          (cond
+           ((vectorp def) def)
+           ((keymapp def) (esc--process prompt def events))
+           ((functionp def) (apply def (list prompt)))
+           ((vconcat [27] (esc--read-events events)))))
+      (if previous-events
+          (vconcat [27] (reverse previous-events))
+        (esc--quit)))))
+
 (defun esc--decode (prompt)
-  (let ((events (esc--read-events nil)))
-    (if (not events)
-        (esc--quit)
-      (let ((def (if esc--decode-map
-                     (lookup-key esc--decode-map (vconcat events))
-                   nil)))
-        (cond
-         ((functionp def)
-          (apply def (list prompt)))
-         (def)
-         ((= 1 (length events))
-          (vector (event-apply-modifier (car events) 'meta 27 "M-")))
-         (t
-          (push 27 events)
-          (vconcat events)))))))
+  (esc--process prompt esc--decode-map nil))
 
 (defvar esc-mode-map (make-sparse-keymap))
 

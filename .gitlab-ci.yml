@@ -2,4 +2,4 @@ image: alpine:3.5
 
 test:
   stage: test
-  script: apk --update add emacs-nox make && make
+  script: apk --update add bash emacs-nox make && make
