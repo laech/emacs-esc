@@ -7,11 +7,18 @@
 
 ;;; Commentary:
 
-;; Provides a global minor mode esc-mode, when the escape key is
+;; Provides a global minor mode `esc-mode', when the escape key is
 ;; pressed and released on its own, perform a quit action (like C-g),
 ;; instead of acting like a prefix key.
 
 ;;; Code:
+
+(defcustom esc-quit-function 'esc--quit
+  "Name of function to call when escape is pressed on its own.
+Default is to delegate to whatever action that is under C-g at
+the time of invocation."
+  :group 'esc
+  :type 'text)
 
 (defvar esc--test-command-override nil)
 
@@ -56,7 +63,7 @@
            ((vconcat [27] (esc--read-events events)))))
       (if previous-events
           (vconcat [27] (reverse previous-events))
-        (esc--quit)))))
+        (apply esc-quit-function '())))))
 
 (defun esc--decode (prompt)
   (esc--process prompt esc--decode-map nil))
@@ -69,15 +76,13 @@
   :global t
   (cond
    (esc-mode
-    (if (display-graphic-p)
-        (define-key esc-mode-map [escape] 'esc--quit)
-      (setq esc--decode-map (lookup-key input-decode-map [?\e]))
-      (define-key input-decode-map [?\e] 'esc--decode)))
+    (setq esc--decode-map (lookup-key input-decode-map [?\e]))
+    (define-key input-decode-map [?\e] 'esc--decode)
+    (define-key input-decode-map [escape] 'esc--decode))
    (t
-    (if (display-graphic-p)
-        (define-key esc-mode-map [escape] nil)
-      (define-key input-decode-map [?\e] esc--decode-map)
-      (setq esc--decode-map nil)))))
+    (define-key input-decode-map [?\e] esc--decode-map)
+    (define-key input-decode-map [escape] nil)
+    (setq esc--decode-map nil))))
 
 (provide 'esc)
 
