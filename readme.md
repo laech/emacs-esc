@@ -23,7 +23,7 @@ Add to your Emacs init file:
 
 `esc-mode` will bind a special function to <kbd>ESC</kbd> in
 `input-decode-map`, if you try to bind any key prefixed with
-<kbd>ESC</kdb> in there after `esc-mode` is enabled, you'll see an
+<kbd>ESC</kbd> in there after `esc-mode` is enabled, you'll see an
 error `Key sequence <your-keys> starts with non-prefix key ESC`,
 therefore you need to add such key bindings before enabling
 `esc-mode`.
@@ -35,4 +35,4 @@ Customizations can be done via: <kbd>M-x</kbd> `customize-group`
 
  * `esc-quit-function`: Name of function to call when escape is
    pressed on its own. Default is to delegate to whatever action that
-   is under <kbd>C-g<kbd> at the time of invocation.
+   is under <kbd>C-g</kbd> at the time of invocation.
