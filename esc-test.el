@@ -26,6 +26,14 @@
    (setq unread-command-events (listify-key-sequence "[1;5C"))
    (should (equal [C-right] (esc--decode nil)))))
 
+(ert-deftest should-be-able-to-partially-match-multiple-events ()
+  (test
+   (define-key input-decode-map "\e[1" (lambda (prompt) [up]))
+   (esc-mode)
+   (setq unread-command-events (listify-key-sequence "[1;5C"))
+   (should (equal [up] (esc--decode nil)))
+   (should (equal (listify-key-sequence ";5C") unread-command-events))))
+
 (ert-deftest should-be-able-to-decode-using-function ()
   (test
    (define-key input-decode-map [?\e ?3] (lambda (prompt) [left]))
