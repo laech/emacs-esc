@@ -1,0 +1,13 @@
+The following should still work in both GUI and terminal Emacs:
+
+ - Standard meta commands, e.g. M-f, M-g g.
+ - C-h k (describe-key) would still work for meta commands.
+ - xterm-mouse-mode in terminal, mouse drag selection still work.
+ - Commnads that generate longer escape key sequences, e.g. C-right.
+
+Additionally the following new functionality will work with by typing
+a single ESC:
+
+ - Quit out of region selection.
+ - Quit out of partially typed commands, such as M-g.
+ - Quit out of minibuffer.
