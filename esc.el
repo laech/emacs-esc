@@ -36,7 +36,6 @@ the time of invocation."
    ((esc--lookup-key-in (current-active-maps t (point)) key))))
 
 (defun esc--quit ()
-  (interactive)
   (apply
    (cond
     ((esc--lookup-key  [?\C-g]))
@@ -52,10 +51,10 @@ the time of invocation."
       (reverse events))))
 
 (defun esc--process (prompt keymap previous-events)
-  (let* ((event (read-event nil nil 0.01))
-         (events (cons event previous-events)))
+  (let ((event (read-event nil nil 0.01)))
     (if (and event keymap)
-        (let ((def (lookup-key keymap (vector event))))
+        (let* ((def (lookup-key keymap (vector event)))
+               (events (cons event previous-events)))
           (cond
            ((vectorp def) def)
            ((keymapp def) (esc--process prompt def events))
@@ -67,8 +66,6 @@ the time of invocation."
 
 (defun esc--decode (prompt)
   (esc--process prompt esc--decode-map nil))
-
-(defvar esc-mode-map (make-sparse-keymap))
 
 ;;;###autoload
 (define-minor-mode esc-mode
