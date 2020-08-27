@@ -18,7 +18,7 @@ Add to your Emacs init file:
 ```elisp
 (add-to-list 'load-path "<path-to-cloned-directory>")
 (require 'esc)
-(esc-mode) ;; Add this line to the end of your init file, see below
+(add-hook 'emacs-startup-hook 'esc-mode)
 ```
 
 `esc-mode` will bind a special function to <kbd>ESC</kbd> in
